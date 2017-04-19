@@ -36,6 +36,11 @@ public class CalculateSales {
 		}
 		try {
 			File files1 = new File(args[0]);
+			if(!files1.exists()){
+				System.out.println("売上ファイルが連番になっていません");
+				return;
+
+			}
 			File[] fList = files1.listFiles();
 			for (int i = 0; i < fList.length; i++) {
 				// 読み込んだレジストリから『数字八桁』かつ『.rsd』のファイルを選別しリストに当て込む
@@ -55,7 +60,8 @@ public class CalculateSales {
 				System.out.println("売上ファイル名が連番になっていません");
 				return;
 			}
-		} for (int i = 0; i < extraction.size(); i++) {
+		}
+		for (int i = 0; i < extraction.size(); i++) {
 			ArrayList<String> allocation = new ArrayList<String>();
 
 			// 抽出した売り上げデータからファイルを読み込む
@@ -73,22 +79,20 @@ public class CalculateSales {
 				if (allocation.size() != 3) {
 					System.out.println(extraction.get(i).getName() + "のフォーマットが不正です");
 					br.close();
-					return;
 				}
 				//売上ファイルの支店番号が定義ファイルに存在しなかったらエラーを出す
-				if (branchSalesMap.get(allocation.get(0)) == null){
+				if (branchSalesMap.containsKey(allocation.get(0))){
 					System.out.println(extraction.get(i).getName() + "の支店コードが不正です");
-					br.close();
 					return;
 				}
 				//売上ファイルの商品番号が定義ファイルに存在しなかったらエラーを出す
-				if(commoditySalesMap.get(allocation.get(1))==null){
-					System.out.println(extraction.get(i).getName()+"の支店コードが不正です");
-					br.close();
+				if(!commoditySalesMap.containsKey(allocation.get(1))){
+					System.out.println(extraction.get(i).getName()+"の商品コードが不正です");
 					return;
 				}
-				if(allocation.get(2).matches("\\d+")==false){
+				if(!allocation.get(2).matches("\\d+")){
 					System.out.println("予期せぬエラーが発生しました");
+
 					return;
 				}
 				// 支店別売上mapの現在の支店の売上数値に＋する
@@ -110,6 +114,7 @@ public class CalculateSales {
 
 			} catch (IOException e) {
 				System.out.println("予期せぬエラーが発生しました");
+				return;
 			} finally {
 				try{
 					if(br != null) {
@@ -204,7 +209,7 @@ public class CalculateSales {
 				String[] nameSp = nameStr.split(",");
 				// 読み込んだデータをそれぞれのMAPに覚えさせる
 				// 支店番号が数字で３桁でなければエラーを返す
-				if (nameSp[0].matches(matchesCondition) ) {
+				if (nameSp[0].matches(matchesCondition) ||nameSp[0].length()!=2) {
 					// branchMap,commodityMapへ落とし込み
 					nameMap.put(nameSp[0], nameSp[1]);
 					salesMap.put(nameSp[0], 0L);
