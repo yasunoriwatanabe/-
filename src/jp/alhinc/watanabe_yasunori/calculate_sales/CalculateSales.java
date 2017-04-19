@@ -25,7 +25,7 @@ public class CalculateSales {
 		HashMap<String, Long> commoditySalesMap = new HashMap<String, Long>();
 
 		if (args.length != 1) {
-			System.out.println("予期せぬエラーが発生しました");
+			System.out.println("予期せぬエラーが発生しました1");
 			return;
 		}
 		if ((readFile(args[0], "branch.lst", branchMap, branchSalesMap, "\\d{3}", "支店"))!=true) {
@@ -36,20 +36,20 @@ public class CalculateSales {
 		}
 		try {
 			File files1 = new File(args[0]);
+
 			if(!files1.exists()){
 				System.out.println("売上ファイルが連番になっていません");
 				return;
-
 			}
 			File[] fList = files1.listFiles();
 			for (int i = 0; i < fList.length; i++) {
 				// 読み込んだレジストリから『数字八桁』かつ『.rsd』のファイルを選別しリストに当て込む
-				if (fList[i].getName().matches("\\d{8}.rcd$")) {
+				if (fList[i].getName().matches("\\d{8}.rcd$")&&(fList[i].isFile())){
 					extraction.add(fList[i]);
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("予期せぬエラーが発生しました");
+			System.out.println("予期せぬエラーが発生しました2");
 			return;
 		}
 		// 売上ファイルが連番でなけばエラーを表示する
@@ -78,21 +78,21 @@ public class CalculateSales {
 				}
 				if (allocation.size() != 3) {
 					System.out.println(extraction.get(i).getName() + "のフォーマットが不正です");
-					br.close();
+					return;
 				}
+				System.out.println("all"+allocation);
 				//売上ファイルの支店番号が定義ファイルに存在しなかったらエラーを出す
-				if (branchSalesMap.containsKey(allocation.get(0))){
+				if (!branchMap.containsKey(allocation.get(0))){
 					System.out.println(extraction.get(i).getName() + "の支店コードが不正です");
 					return;
 				}
 				//売上ファイルの商品番号が定義ファイルに存在しなかったらエラーを出す
-				if(!commoditySalesMap.containsKey(allocation.get(1))){
+				if(!commodityMap.containsKey(allocation.get(1))){
 					System.out.println(extraction.get(i).getName()+"の商品コードが不正です");
 					return;
 				}
 				if(!allocation.get(2).matches("\\d+")){
 					System.out.println(extraction.get(i).getName() +"のフォーマットが不正です");
-
 					return;
 				}
 				// 支店別売上mapの現在の支店の売上数値に＋する
@@ -113,7 +113,7 @@ public class CalculateSales {
 				commoditySalesMap.put(allocation.get(1), commoditySum);
 
 			} catch (IOException e) {
-				System.out.println("予期せぬエラーが発生しました");
+				System.out.println("予期せぬエラーが発生しました3");
 				return;
 			} finally {
 				try{
@@ -121,7 +121,7 @@ public class CalculateSales {
 						br.close();
 					}
 				} catch(IOException e) {
-					System.out.println("予期せぬエラーが発生しました");
+					System.out.println("予期せぬエラーが発生しました4");
 					return;
 				}
 			}
@@ -143,7 +143,7 @@ public class CalculateSales {
 			// falseが返ってきたら実行を取り消しする
 			return;
 		} if (!writeFile(args[0], "commodity.out", commodityMap, commoditySalesMap)) {
-			System.out.println("予期せぬエラーが発生しました");
+			System.out.println("予期せぬエラーが発生しました5");
 			return;
 		}
 	}
@@ -169,7 +169,7 @@ public class CalculateSales {
 				bw.write(be.getKey() + "," + namemap.get(be.getKey()) + "," + be.getValue() + crlf);
 			}
 		} catch (IOException e) {
-			System.out.println("予期せぬエラーが発生しました");
+			System.out.println("予期せぬエラーが発生しました6");
 			return false;
 		} finally {
 			try {
@@ -179,9 +179,10 @@ public class CalculateSales {
 			}
 			catch (IOException e) {
 				// TODO 自動生成された catch ブロック
-				System.out.println("予期せぬエラーが発生しました");
+				System.out.println("予期せぬエラーが発生しました7");
 			}
 		}
+		System.out.println("OK");
 		return true;
 	}
 	public static boolean readFile(String dirPath, String fileName, HashMap<String, String> nameMap,
@@ -193,10 +194,7 @@ public class CalculateSales {
 		BufferedReader br = null;
 
 		File nameFile = new File(dirPath, fileName);
-		if(!nameFile.exists()){
-			System.out.println(error+"定義ファイルが存在しません");
-			return false;
-		}
+
 		try {
 			FileReader nameFr = new FileReader(nameFile);
 			br = new BufferedReader(nameFr);
@@ -228,7 +226,7 @@ public class CalculateSales {
 				br.close();
 			} catch (IOException e) {
 				// TODO 自動生成された catch ブロック
-				System.out.println("予期せぬエラーが発生しました");
+				System.out.println("予期せぬエラーが発生しました8");
 				return false;
 			}
 		} return true;
