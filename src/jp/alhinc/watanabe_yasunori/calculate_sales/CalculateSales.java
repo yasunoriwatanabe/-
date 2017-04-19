@@ -91,7 +91,7 @@ public class CalculateSales {
 					return;
 				}
 				if(!allocation.get(2).matches("\\d+")){
-					System.out.println("予期せぬエラーが発生しました");
+					System.out.println(extraction.get(i).getName() +"のフォーマットが不正です");
 
 					return;
 				}
@@ -122,6 +122,7 @@ public class CalculateSales {
 					}
 				} catch(IOException e) {
 					System.out.println("予期せぬエラーが発生しました");
+					return;
 				}
 			}
 		} for (String key : branchSalesMap.keySet()) {
