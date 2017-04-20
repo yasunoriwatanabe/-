@@ -142,8 +142,8 @@ public class CalculateSales {
 				return;
 			}
 		}
-		System.out.println(branchSalesMap);
-		System.out.println(commoditySalesMap);
+		//System.out.println(branchSalesMap);
+		//System.out.println(commoditySalesMap);
 		// メソッドへファイルの書き出しをさせる
 		if ( !writeFile( args[0], "branch.out", branchMap, branchSalesMap ) ) {
 			// falseが返ってきたら実行を取り消しする
