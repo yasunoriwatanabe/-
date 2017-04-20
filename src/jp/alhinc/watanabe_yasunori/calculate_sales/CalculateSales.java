@@ -28,7 +28,7 @@ public class CalculateSales {
 			System.out.println("予期せぬエラーが発生しました1");
 			return;
 		}
-		if ((readFile(args[0], "branch.lst", branchMap, branchSalesMap, "\\d{3}", "支店"))!=true) {
+		if ((readFile(args[0], "branch.lst", branchMap, branchSalesMap, "\\d+{3}", "支店"))!=true) {
 			return;
 		}
 		if ((readFile(args[0], "commodity.lst", commodityMap, commoditySalesMap, "[A-Z0-9]{8}", "商品"))!=true) {
@@ -38,7 +38,6 @@ public class CalculateSales {
 			File files1 = new File(args[0]);
 
 			if(!files1.exists()){
-				System.out.println("売上ファイルが連番になっていません");
 				return;
 			}
 			File[] fList = files1.listFiles();
@@ -80,7 +79,7 @@ public class CalculateSales {
 					System.out.println(extraction.get(i).getName() + "のフォーマットが不正です");
 					return;
 				}
-				System.out.println("all"+allocation);
+				//System.out.println("all"+allocation);
 				//売上ファイルの支店番号が定義ファイルに存在しなかったらエラーを出す
 				if (!branchMap.containsKey(allocation.get(0))){
 					System.out.println(extraction.get(i).getName() + "の支店コードが不正です");
@@ -186,15 +185,22 @@ public class CalculateSales {
 		return true;
 	}
 	public static boolean readFile(String dirPath, String fileName, HashMap<String, String> nameMap,
-			HashMap<String, Long> salesMap, String matchesCondition, String error) {
+			HashMap<String, Long> salesMap, String matchesCondition, String name) {
 
 		// 店舗定義用MAPと商品定義用MAP
+
 
 		// branchデータファイルを読み込み
 		BufferedReader br = null;
 
-		File nameFile = new File(dirPath, fileName);
 
+
+
+		File nameFile = new File(dirPath, fileName);
+		if (!nameFile.exists()){
+			System.out.println(name+"定義ファイルが存在しません");
+			return false;
+		}
 		try {
 			FileReader nameFr = new FileReader(nameFile);
 			br = new BufferedReader(nameFr);
@@ -206,19 +212,23 @@ public class CalculateSales {
 				// System.out.println(branch_s);
 				String nameStr = nameS;
 				String[] nameSp = nameStr.split(",");
+				if(nameSp.length!=2){
+					System.out.println(name+"定義ファイルのフォーマットが不正です");
+					return false;
+				}
 				// 読み込んだデータをそれぞれのMAPに覚えさせる
 				// 支店番号が数字で３桁でなければエラーを返す
-				if (nameSp[0].matches(matchesCondition) ||nameSp[0].length()!=2) {
+				if (nameSp[0].matches(matchesCondition) &&nameStr.length()!=2) {
 					// branchMap,commodityMapへ落とし込み
 					nameMap.put(nameSp[0], nameSp[1]);
 					salesMap.put(nameSp[0], 0L);
 				} else {
-					System.out.println(error+"定義ファイルのフォーマットが不正です");
+					System.out.println(name+"定義ファイルのフォーマットが不正です");
 					return false;
 				}
 			}
 		} catch(IOException e)	{
-		System.out.println(error+"定義ファイルのフォーマットが不正です");
+		System.out.println(name+"定義ファイルのフォーマットが不正です");
 
 		return false;
 		} finally {
