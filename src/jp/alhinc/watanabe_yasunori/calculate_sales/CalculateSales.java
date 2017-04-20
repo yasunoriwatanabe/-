@@ -35,13 +35,13 @@ public class CalculateSales {
 			return;
 		}
 		try {
-			File files1 = new File(args[0]);
+			File files = new File(args[0]);
 
-			if ( !files1.exists() ){
+			if ( !files.exists() ){
 				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}
-			File[] fList = files1.listFiles();
+			File[] fList = files.listFiles();
 			for ( int i = 0; i < fList.length; i++ ) {
 				// 読み込んだレジストリから『数字八桁』かつ『.rsd』のファイルを選別しリストに当て込む
 				if (( fList[i].isFile() ) && fList[i].getName().matches("\\d{8}.rcd$") ){
@@ -54,8 +54,8 @@ public class CalculateSales {
 		}
 		// 売上ファイルが連番でなけばエラーを表示する
 		for ( int i = 0; i < extraction.size(); i++ ) {
-			String[] exStr = extraction.get(i).getName().split("[.]");
-			int exInt = Integer.parseInt( exStr[0] );
+			String[] extractionStr = extraction.get(i).getName().split("[.]");
+			int exInt = Integer.parseInt( extractionStr[0] );
 			if ( (exInt -= 1) != i ) {
 				System.out.println("売上ファイル名が連番になっていません");
 				return;
@@ -109,10 +109,8 @@ public class CalculateSales {
 				// リストから売上額をStringからlongへ
 				long commodityLong = commoditySalesMap.get( allocation.get(1) );
 				long commoditySum = commodityLong + salesLong;
-
 				// リストからマップへ
 				commoditySalesMap.put( allocation.get(1), commoditySum );
-
 			} catch ( IOException e ) {
 				System.out.println("予期せぬエラーが発生しました");
 				return;
@@ -128,15 +126,13 @@ public class CalculateSales {
 			}
 		}
 		for ( String key : branchSalesMap.keySet() ) {
-			// System.out.println("val : "+branchSalesMap.get(key));
-			if ( branchSalesMap.get(key) > 9999999999L || branchSalesMap.get(key) < -9999999999L ) {
+			if ( branchSalesMap.get(key) > 9999999999L ) {
 				System.out.println("合計金額が10桁を超えました");
 				return;
 			}
 		}
 		for ( String key : commoditySalesMap.keySet() ) {
-			// System.out.println("val : "+commoditySalesMap.get(key));
-			if ( commoditySalesMap.get(key) > 9999999999L || commoditySalesMap.get(key) < -9999999999L ) {
+			if ( commoditySalesMap.get(key) > 9999999999L ) {
 				System.out.println("合計金額が10桁を超えました");
 				return;
 			}
@@ -168,9 +164,9 @@ public class CalculateSales {
 			FileWriter fw = new FileWriter(total);
 			bw = new BufferedWriter(fw);
 
-			for ( Entry<String, Long> en : salesEntry ) {
+			for ( Entry<String, Long> entry : salesEntry ) {
 				// 書き出す内容
-				bw.write(en.getKey() + "," + nameMap.get(en.getKey() ) + "," + en.getValue() + crlf );
+				bw.write(entry.getKey() + "," + nameMap.get(entry.getKey() ) + "," + entry.getValue() + crlf );
 			}
 		} catch ( IOException e ) {
 			System.out.println("予期せぬエラーが発生しました");
@@ -193,27 +189,26 @@ public class CalculateSales {
 		// branchデータファイルを読み込み
 		BufferedReader br = null;
 
-		File nameFile = new File( dirPath, fileName );
-		if ( !nameFile.exists() ){
+		File file = new File( dirPath, fileName );
+		if ( !file.exists() ){
 			System.out.println( name + "定義ファイルが存在しません");
 			return false;
 		}
 		try {
-			FileReader nameFr = new FileReader(nameFile);
-			br = new BufferedReader(nameFr);
+			FileReader fr = new FileReader(file);
+			br = new BufferedReader(fr);
 			// エラー処理
 			// データファイルを文字列に
-			String nameS;
+			String str;
 			// 繰り返してデータファイルを一行ずつ読み込む
-			while ( ( nameS = br.readLine() ) != null ) {
-				String nameStr = nameS;
-				String[] nameSp = nameStr.split(",");
+			while ( ( str = br.readLine() ) != null ) {
+				String[] split = str.split(",");
 				// 読み込んだデータをそれぞれのMAPに覚えさせる
 				// 支店番号が数字で３桁でなければエラーを返す
-				if (nameSp.length==2 && nameSp[0].matches(matchesCondition)) {
+				if (split.length==2 && split[0].matches(matchesCondition)) {
 					// branchMap,commodityMapへ落とし込み
-					nameMap.put(nameSp[0], nameSp[1]);
-					salesMap.put(nameSp[0], 0L);
+					nameMap.put(split[0], split[1]);
+					salesMap.put(split[0], 0L);
 				} else {
 					System.out.println(name+"定義ファイルのフォーマットが不正です");
 					return false;
