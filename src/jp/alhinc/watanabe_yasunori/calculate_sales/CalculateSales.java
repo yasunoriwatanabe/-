@@ -28,10 +28,10 @@ public class CalculateSales {
 			System.out.println( "予期せぬエラーが発生しました" );
 			return;
 		}
-		if ( (readFile(args[0], "branch.lst", branchMap, branchSalesMap, "\\d+{3}", "支店") ) !=true ) {
+		if ( (readFile(args[0], "branch.lst", branchMap, branchSalesMap, "\\d+{3}", "支店") ) != true ) {
 			return;
 		}
-		if ( (readFile(args[0], "commodity.lst", commodityMap, commoditySalesMap, "[A-Z0-9]{8}", "商品") )!=true ) {
+		if ( (readFile(args[0], "commodity.lst", commodityMap, commoditySalesMap, "[A-Z0-9]{8}", "商品") ) != true ) {
 			return;
 		}
 		try {
@@ -92,23 +92,25 @@ public class CalculateSales {
 					return;
 				}
 				if( !allocation.get(2).matches("\\d+") ){
-					System.out.println( extraction.get(i).getName() + "のフォーマットが不正です");
+					System.out.println("予期せぬエラーが発生しました");
 					return;
 				}
 				// 支店別売上mapの現在の支店の売上数値に＋する
 				long x = branchSalesMap.get( allocation.get(0) );
 
 				// リストから売上額をStringからlongへ
-				long branchAllocationLg = Long.parseLong( allocation.get(2) );
-				long branchSum = x + branchAllocationLg;
-				// リストからマップへ
+				long Lg = Long.parseLong( allocation.get(2) );
+				long branchSum = x + Lg;
 
+				// リストからマップへ
 				branchSalesMap.put( allocation.get(0),branchSum );
 
 				// 商品別売上mapの現在の商品売上数値に+する。
+
 				// リストから売上額をStringからlongへ
-				long commodityAllocationLg = Long.parseLong( allocation.get(2) );
-				long commoditySum = commodityAllocationLg;
+				long y = commoditySalesMap.get( allocation.get(1) );
+				long commoditySum = y + Lg;
+
 				// リストからマップへ
 				commoditySalesMap.put( allocation.get(1), commoditySum );
 
@@ -140,20 +142,22 @@ public class CalculateSales {
 				return;
 			}
 		}
+		System.out.println(branchSalesMap);
+		System.out.println(commoditySalesMap);
 		// メソッドへファイルの書き出しをさせる
 		if ( !writeFile( args[0], "branch.out", branchMap, branchSalesMap ) ) {
 			// falseが返ってきたら実行を取り消しする
 			return;
 		}
 		if ( !writeFile( args[0], "commodity.out", commodityMap, commoditySalesMap ) ) {
-			System.out.println("予期せぬエラーが発生しました");
 			return;
 		}
 	}
+
 	public static boolean writeFile(String dirpath, String filename, HashMap<String, String> namemap,
 			HashMap<String, Long> salesmap) {
-		List<Map.Entry<String, Long>> branchSalesEntry = new ArrayList<Map.Entry<String, Long>>(salesmap.entrySet());
-		Collections.sort(branchSalesEntry, new Comparator<Map.Entry<String, Long>>() {
+		List<Map.Entry<String, Long>> salesEntry = new ArrayList<Map.Entry<String, Long>>(salesmap.entrySet());
+		Collections.sort(salesEntry, new Comparator<Map.Entry<String, Long>>() {
 			public int compare(Entry<String, Long> entry1, Entry<String, Long> entry2) {
 				return ((Long) entry2.getValue()).compareTo((Long) entry1.getValue());
 			}
@@ -163,13 +167,13 @@ public class CalculateSales {
 		try {
 			// 支店別集計ファイルの出力作成
 			// ファイルを変換
-			File branchTotal = new File(dirpath, filename);
-			FileWriter fw = new FileWriter(branchTotal);
+			File total = new File(dirpath, filename);
+			FileWriter fw = new FileWriter(total);
 			bw = new BufferedWriter(fw);
 
-			for ( Entry<String, Long> be : branchSalesEntry ) {
+			for ( Entry<String, Long> en : salesEntry ) {
 				// 書き出す内容
-				bw.write(be.getKey() + "," + namemap.get(be.getKey() ) + "," + be.getValue() + crlf );
+				bw.write(en.getKey() + "," + namemap.get(en.getKey() ) + "," + en.getValue() + crlf );
 			}
 		} catch ( IOException e ) {
 			System.out.println("予期せぬエラーが発生しました");
@@ -182,6 +186,7 @@ public class CalculateSales {
 			}catch ( IOException e ) {
 				// TODO 自動生成された catch ブロック
 				System.out.println("予期せぬエラーが発生しました");
+				return false;
 			}
 		}
 		//System.out.println("OK");
@@ -190,14 +195,8 @@ public class CalculateSales {
 	public static boolean readFile(String dirPath, String fileName, HashMap<String, String> nameMap,
 			HashMap<String, Long> salesMap, String matchesCondition, String name) {
 
-		// 店舗定義用MAPと商品定義用MAP
-
-
 		// branchデータファイルを読み込み
 		BufferedReader br = null;
-
-
-
 
 		File nameFile = new File( dirPath, fileName );
 		if ( !nameFile.exists() ){
@@ -212,7 +211,6 @@ public class CalculateSales {
 			String nameS;
 			// 繰り返してデータファイルを一行ずつ読み込む
 			while ( ( nameS = br.readLine() ) != null ) {
-				// System.out.println(branch_s);
 				String nameStr = nameS;
 				String[] nameSp = nameStr.split(",");
 				if ( nameSp.length!=2 ){
