@@ -181,7 +181,7 @@ public class CalculateSales {
 				System.out.println("予期せぬエラーが発生しました7");
 			}
 		}
-		System.out.println("OK");
+		//System.out.println("OK");
 		return true;
 	}
 	public static boolean readFile(String dirPath, String fileName, HashMap<String, String> nameMap,
