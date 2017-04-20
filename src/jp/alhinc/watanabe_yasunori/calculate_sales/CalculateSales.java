@@ -38,6 +38,7 @@ public class CalculateSales {
 			File files1 = new File(args[0]);
 
 			if ( !files1.exists() ){
+				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}
 			File[] fList = files1.listFiles();
